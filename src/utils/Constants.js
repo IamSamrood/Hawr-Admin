@@ -1,5 +1,5 @@
-// export const baseUrl = 'https://gnana-prakasam.onrender.com';
-export const baseUrl = 'http://localhost:3000';
+export const baseUrl = 'https://gnana-prakasam.onrender.com';
+// export const baseUrl = 'http://localhost:3000';
 
 
 // urls
