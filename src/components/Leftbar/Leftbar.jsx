@@ -6,15 +6,16 @@ import ListItemText from '@mui/material/ListItemText';
 import React from 'react'
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import ArticleIcon from '@mui/icons-material/Article';
 import { Box } from '@mui/material';
-import { Article } from '@mui/icons-material';
+import { Article, Category, Inventory2 } from '@mui/icons-material';
 
 
 const Leftbar = () => {
 
     const dispatch = useDispatch();
+
     const navigate = useNavigate();
+
 
     return (
         <Box flex={1}
@@ -31,6 +32,26 @@ const Leftbar = () => {
                                 <Article />
                             </ListItemIcon>
                             <ListItemText primary="Appointments" />
+                        </ListItemButton>
+                    </ListItem>
+                </List>
+                <List>
+                    <ListItem disablePadding>
+                        <ListItemButton onClick={()=>navigate('/categories')}>
+                            <ListItemIcon>
+                                <Category />
+                            </ListItemIcon>
+                            <ListItemText primary="Categories" />
+                        </ListItemButton>
+                    </ListItem>
+                </List>
+                <List>
+                    <ListItem disablePadding>
+                        <ListItemButton onClick={() => navigate('/products')}>
+                            <ListItemIcon>
+                                <Inventory2 />
+                            </ListItemIcon>
+                            <ListItemText primary="Products" />
                         </ListItemButton>
                     </ListItem>
                 </List>

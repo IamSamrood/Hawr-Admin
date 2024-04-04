@@ -3,9 +3,11 @@ import { Box, createTheme } from "@mui/material";
 import { useSelector } from "react-redux";
 import { Navigate, Outlet, Route, Routes } from "react-router-dom";
 import Navbar from "../components/Navbar/Navbar";
-import SignIn from "../pages/signin/SingIn";
-import Signup from "../pages/signup/Signup";
+// import SignIn from "../pages/signin/SingIn";
+// import Signup from "../pages/signup/Signup";
 import Home from "../pages/home/Home";
+import Categories from "../pages/Categories/Categories";
+import Products from "../pages/products/Products";
 
 
 
@@ -55,15 +57,17 @@ const Admin = () => {
                 }
             >
                 <Route path="/" element={<Home />} />
+                <Route path="/categories" element={<Categories />} />
+                <Route path="/products" element={<Products />} />
             </Route>
-            <Route
+            {/* <Route
                 path="/login"
                 element={currentUser ? <Navigate to="/" /> : <SignIn />}
             />
             <Route
-        path="/signup"
-        element={currentUser ? <Navigate to="/" /> : <Signup />}
-      />
+                path="/signup"
+                element={currentUser ? <Navigate to="/" /> : <Signup />}
+            /> */}
         </Routes>
     );
 }

@@ -7,6 +7,7 @@ export const getAppoinments = async () => {
     try {
        
         let { data } = await axios.get(getAppointment);
+        
         return data?.appointments ?? [];
     } catch (error) {
         console.log(error);
