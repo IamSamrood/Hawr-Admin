@@ -28,7 +28,6 @@ const AddEditProductModal = ({ open, handleClose, initialValues, addProduct, edi
             setValue("description", initialValues.description);
             setValue("rating", initialValues.rating);
             setValue("code", initialValues.code);
-            setValue("price", initialValues.price);
             setValue("category", initialValues.category);
             setSizes(initialValues.sizes ?? []);
         }
@@ -55,7 +54,6 @@ const AddEditProductModal = ({ open, handleClose, initialValues, addProduct, edi
                 description: data.description,
                 images: urls,
                 code: data.code,
-                price: data.price,
                 offer: data.offer,
                 category: data.category
             };
@@ -90,7 +88,7 @@ const AddEditProductModal = ({ open, handleClose, initialValues, addProduct, edi
 
 
     const handleAddSize = () => {
-        setSizes([...sizes, { name: '', quantity: '' }]);
+        setSizes([...sizes, { name: '', quantity: '', price: '' }]);
     };
 
     const handleRemoveSize = (index) => {
@@ -221,46 +219,6 @@ const AddEditProductModal = ({ open, handleClose, initialValues, addProduct, edi
                     )}
                 />
 
-                <Box sx={{
-                    display: 'flex',
-                    gap:3,
-                }}>
-                    <Controller
-                        name="price"
-                        control={control}
-                        defaultValue=""
-                        rules={{ required: 'Price is required' }}
-                        render={({ field }) => (
-                            <TextField
-                                {...field}
-                                type='number'
-                                label="Price"
-                                fullWidth
-                                margin="normal"
-                                variant="outlined"
-                                error={!!errors.price}
-                                helperText={errors.price && errors.price.message}
-                            />
-                        )}
-                    />
-
-                    <Controller
-                        name="offer"
-                        control={control}
-                        defaultValue=""
-                        render={({ field }) => (
-                            <TextField
-                                {...field}
-                                type='number'
-                                label="Offer"
-                                fullWidth
-                                margin="normal"
-                                variant="outlined"
-                            />
-                        )}
-                    />
-
-                </Box>
                 
                 {/* Sizes */}
                 {sizes.map((size, index) => (
@@ -287,6 +245,15 @@ const AddEditProductModal = ({ open, handleClose, initialValues, addProduct, edi
                             variant="outlined"
                             style={{ marginBottom: '8px', width: '80%' }}
                         />
+                        <TextField
+                            label={`Price ${index + 1}`}
+                            value={size.price}
+                            onChange={(e) => handleSizeChange(index, 'price', e.target.value)}
+                            fullWidth
+                            margin="normal"
+                            variant="outlined"
+                            style={{ marginBottom: '8px', width: '80%' }}
+                        />
                         <IconButton onClick={() => handleRemoveSize(index)} color="secondary"><Close/></IconButton>
                     </div>
                 ))}
@@ -297,7 +264,21 @@ const AddEditProductModal = ({ open, handleClose, initialValues, addProduct, edi
                     </p>
                 )}
 
-                
+                <Controller
+                    name="offer"
+                    control={control}
+                    defaultValue=""
+                    render={({ field }) => (
+                        <TextField
+                            {...field}
+                            type='number'
+                            label="Offer"
+                            fullWidth
+                            margin="normal"
+                            variant="outlined"
+                        />
+                    )}
+                />
 
                 <div {...getRootProps()} style={{ marginTop: '16px', border: imageError ? '2px dashed red' : '2px dashed #ccc', borderRadius: '4px', padding: '16px', cursor: 'pointer' }}>
                     <input {...getInputProps()} />

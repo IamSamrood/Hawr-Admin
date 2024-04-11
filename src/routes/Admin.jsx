@@ -8,6 +8,7 @@ import Navbar from "../components/Navbar/Navbar";
 import Home from "../pages/home/Home";
 import Categories from "../pages/Categories/Categories";
 import Products from "../pages/products/Products";
+import Coupons from "../pages/Coupons/Coupons";
 
 
 
@@ -44,6 +45,7 @@ const Admin = () => {
 
         return children;
     };
+    
 
 
     return (
@@ -59,6 +61,7 @@ const Admin = () => {
                 <Route path="/" element={<Home />} />
                 <Route path="/categories" element={<Categories />} />
                 <Route path="/products" element={<Products />} />
+                <Route path="/coupons" element={<Coupons />} />
             </Route>
             {/* <Route
                 path="/login"

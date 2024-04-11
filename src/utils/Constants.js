@@ -16,6 +16,9 @@ export const getAllCategory = '/categroy/all';
 export const uploadFile = '/file/upload-file';
 export const uploadFiles = '/file/upload-files';
 
-export const getProduct = '/product';
+export const getProduct = '/product/get-products';
 export const addNewProduct = '/product';
+
+export const getCoupon = '/coupon';
+export const addNewCoupon = '/coupon';
 

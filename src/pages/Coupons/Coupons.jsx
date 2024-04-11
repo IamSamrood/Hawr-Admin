@@ -3,15 +3,14 @@ import Leftbar from "../../components/Leftbar/Leftbar";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 import { useEffect, useState } from "react";
-import moment from "moment";
 import { Delete, Edit } from "@mui/icons-material";
-import { addProductPost, getProducts } from "../../httpCalls/product";
-import AddEditProductModal from "../../components/AddProduct/AddProduct";
+import { addCouponPost, getCoupons } from "../../httpCalls/coupon";
+import AddEditCouponModal from "../../components/AddCoupon/AddCoupon";
 
 
-const Products = () => {
+const Coupons = () => {
 
-    const [products, setProducts] = useState([]);
+    const [coupons, setCoupons] = useState([]);
     const rowsPerPageOptions = [5, 10, 25];
     const [rowsPerPage, setRowsPerPage] = useState(rowsPerPageOptions[0]);
     const [page, setPage] = useState(1);
@@ -31,22 +30,19 @@ const Products = () => {
 
 
 
-    const getAllProducts = async (page, rowsPerPage) => {
-        let { products, total } = await getProducts(page, rowsPerPage);
-        setProducts(products);
+    const getAllCoupons = async (page, rowsPerPage) => {
+        let { coupons, total } = await getCoupons(page, rowsPerPage);
+        setCoupons(coupons);
         setTotal(total);
-        console.log(products);
     };
 
-    
-
     useEffect(() => {
-        getAllProducts(page, rowsPerPage);
+        getAllCoupons(page, rowsPerPage);
     }, [rowsPerPage, page]);
 
 
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [initialValues, setInitialValues] = useState({ category: '', image: '' });
+    const [initialValues, setInitialValues] = useState({ code: '', offer: '' });
 
     const handleOpenModal = () => {
         setIsModalOpen(true);
@@ -56,20 +52,20 @@ const Products = () => {
         setIsModalOpen(false);
     };
 
-    const handleEditClick = (category, image, id) => {
+    const handleEditClick = (code, offer, id) => {
         setInitialValues({
-            category, image, id
+            code, offer, id
         });
         handleOpenModal();
     }
 
-    const addProduct = async (formData) => {
-        addProductPost(formData)
+    const addCoupon = async (formData) => {
+        addCouponPost(formData)
     };
 
-    const editProduct = async (productId, formData) => {
-        // Implement logic to edit product using productId and formData
-        console.log('Editing product:', productId, formData);
+    const editCoupon = async (couponId, formData) => {
+        // Implement logic to edit category using categoryId and formData
+        console.log('Editing category:', couponId, formData);
     };
 
     return (
@@ -129,18 +125,17 @@ const Products = () => {
                         Clear
                     </Button>
                 </Stack>
-                <h1>Products</h1>
+                <h1>Coupons</h1>
                 <Button onClick={() => handleOpenModal()}>
-                    Add Product
+                    Add Coupon
                 </Button>
                 <TableContainer component={Paper}>
                     <Table>
                         <TableHead>
                             <TableRow>
                                 <TableCell>ID</TableCell>
-                                <TableCell>Category</TableCell>
-                                <TableCell>Image</TableCell>
-                                <TableCell>Date</TableCell>
+                                <TableCell>code</TableCell>
+                                <TableCell>offer</TableCell>
                                 <TableCell>Options</TableCell>
                             </TableRow>
                         </TableHead>
@@ -148,26 +143,16 @@ const Products = () => {
                             {
 
 
-                                products?.map((app) => (
+                                coupons?.map((app) => (
                                     <TableRow key={app._id}>
                                         <TableCell>{app._id}</TableCell>
-                                        <TableCell>{app?.category.category}</TableCell>
+                                        <TableCell>{app.code}</TableCell>
                                         <TableCell>
-                                            <Box sx={{
-                                                height: '3rem',
-                                                width: '3rem'
-                                            }}>
-                                                <img src={app?.images?.[0]} style={{
-                                                    width: '100%',
-                                                    height: '100%'
-                                                }} alt="" />
-                                            </Box>
+                                            {app.offer}
                                         </TableCell>
+                                        
                                         <TableCell>
-                                            {moment(app.date).format('DD/MM/YYYY')}
-                                        </TableCell>
-                                        <TableCell>
-                                            <IconButton onClick={() => handleEditClick(app.category, app.image, app._id)}>
+                                            <IconButton onClick={() => handleEditClick(app.code, app.offer, app._id)}>
                                                 <Edit sx={{ color: 'blue' }} />
                                             </IconButton>
                                             <IconButton>
@@ -190,15 +175,15 @@ const Products = () => {
                     onRowsPerPageChange={handleChangeRowsPerPage}
                 />
             </Grid>
-            <AddEditProductModal
+            <AddEditCouponModal
                 open={isModalOpen}
                 handleClose={handleCloseModal}
                 initialValues={initialValues}
-                addProduct={addProduct}
-                editProduct={editProduct}
+                addCoupon={addCoupon}
+                editCoupon={editCoupon}
             />
         </Grid>
     );
 };
 
-export default Products
+export default Coupons

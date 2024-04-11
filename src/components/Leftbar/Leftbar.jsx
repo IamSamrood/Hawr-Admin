@@ -7,7 +7,7 @@ import React from 'react'
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { Box } from '@mui/material';
-import { Article, Category, Inventory2 } from '@mui/icons-material';
+import { Article, Category, Inventory2, LocalOffer } from '@mui/icons-material';
 
 
 const Leftbar = () => {
@@ -52,6 +52,16 @@ const Leftbar = () => {
                                 <Inventory2 />
                             </ListItemIcon>
                             <ListItemText primary="Products" />
+                        </ListItemButton>
+                    </ListItem>
+                </List>
+                <List>
+                    <ListItem disablePadding>
+                        <ListItemButton onClick={() => navigate('/coupons')}>
+                            <ListItemIcon>
+                                <LocalOffer />
+                            </ListItemIcon>
+                            <ListItemText primary="Coupons" />
                         </ListItemButton>
                     </ListItem>
                 </List>
