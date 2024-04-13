@@ -9,6 +9,7 @@ import Home from "../pages/home/Home";
 import Categories from "../pages/Categories/Categories";
 import Products from "../pages/products/Products";
 import Coupons from "../pages/Coupons/Coupons";
+import Orders from "../pages/Orders/Orders";
 
 
 
@@ -62,6 +63,7 @@ const Admin = () => {
                 <Route path="/categories" element={<Categories />} />
                 <Route path="/products" element={<Products />} />
                 <Route path="/coupons" element={<Coupons />} />
+                <Route path="/orders" element={<Orders />} />
             </Route>
             {/* <Route
                 path="/login"

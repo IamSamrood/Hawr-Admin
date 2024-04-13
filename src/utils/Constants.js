@@ -22,3 +22,6 @@ export const addNewProduct = '/product';
 export const getCoupon = '/coupon';
 export const addNewCoupon = '/coupon';
 
+export const getOrder = '/order';
+export const updateStatus = '/order'
+
