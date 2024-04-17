@@ -5,7 +5,7 @@ import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 import { useEffect, useState } from "react";
 import moment from "moment";
 import { Delete, Edit } from "@mui/icons-material";
-import { addProductPost, getProducts } from "../../httpCalls/product";
+import { addProductPost, editProductPut, getProducts } from "../../httpCalls/product";
 import AddEditProductModal from "../../components/AddProduct/AddProduct";
 
 
@@ -35,7 +35,6 @@ const Products = () => {
         let { products, total } = await getProducts(page, rowsPerPage);
         setProducts(products);
         setTotal(total);
-        console.log(products);
     };
 
     
@@ -46,7 +45,7 @@ const Products = () => {
 
 
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [initialValues, setInitialValues] = useState({ category: '', image: '' });
+    const [initialValues, setInitialValues] = useState('');
 
     const handleOpenModal = () => {
         setIsModalOpen(true);
@@ -56,20 +55,18 @@ const Products = () => {
         setIsModalOpen(false);
     };
 
-    const handleEditClick = (category, image, id) => {
-        setInitialValues({
-            category, image, id
-        });
+    const handleEditClick = (product) => {
+        setInitialValues(product);
         handleOpenModal();
     }
 
     const addProduct = async (formData) => {
-        addProductPost(formData)
+       await addProductPost(formData)
     };
 
     const editProduct = async (productId, formData) => {
-        // Implement logic to edit product using productId and formData
-        console.log('Editing product:', productId, formData);
+        let data = { productId, ...formData };
+        await editProductPut(data);
     };
 
     return (
@@ -167,7 +164,7 @@ const Products = () => {
                                             {moment(app.date).format('DD/MM/YYYY')}
                                         </TableCell>
                                         <TableCell>
-                                            <IconButton onClick={() => handleEditClick(app.category, app.image, app._id)}>
+                                            <IconButton onClick={() => handleEditClick(app)}>
                                                 <Edit sx={{ color: 'blue' }} />
                                             </IconButton>
                                             <IconButton>

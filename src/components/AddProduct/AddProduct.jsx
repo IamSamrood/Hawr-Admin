@@ -3,7 +3,7 @@ import { Modal, TextField, Button, Box, IconButton, Select, MenuItem } from '@mu
 import { useForm, Controller } from 'react-hook-form';
 import { useDropzone } from 'react-dropzone';
 import {  uploadFilesPost } from '../../httpCalls/fileUpload';
-import { Close } from '@mui/icons-material';
+import { Close, CloseOutlined } from '@mui/icons-material';
 import { getAllCategories } from '../../httpCalls/category';
 
 const AddEditProductModal = ({ open, handleClose, initialValues, addProduct, editProduct }) => {
@@ -14,11 +14,13 @@ const AddEditProductModal = ({ open, handleClose, initialValues, addProduct, edi
     const [sizes, setSizes] = useState([]);
     const [sizeError, setSizeError] = useState('');
     const [categories, setCategories] = useState([]);
+    const [removed, setRemoved] = useState([]);
 
 
     const { handleSubmit, control, reset, setValue, formState: { errors } } = useForm({
         defaultValues: initialValues,
     });
+
 
 
     useEffect(() => {
@@ -28,8 +30,10 @@ const AddEditProductModal = ({ open, handleClose, initialValues, addProduct, edi
             setValue("description", initialValues.description);
             setValue("rating", initialValues.rating);
             setValue("code", initialValues.code);
-            setValue("category", initialValues.category);
-            setSizes(initialValues.sizes ?? []);
+            setValue("category", initialValues.category._id);
+            setValue("offer", initialValues.offer);
+            setSizes(initialValues.size ?? []);
+            setSelectedFiles(initialValues.images);
         }
     }, [initialValues]);
 
@@ -46,7 +50,14 @@ const AddEditProductModal = ({ open, handleClose, initialValues, addProduct, edi
 
             setSizeError('');
 
-            const urls = await uploadFilesPost(selectedFiles, 'Products');
+            let urls = [];
+
+            console.log(removed);
+            if (initialValues._id) {
+             urls =  await uploadFilesPost(selectedFiles, 'Products', removed);
+            } else {
+                urls = await uploadFilesPost(selectedFiles, 'Products');
+            }
 
             const formData = {
                 name: data.name,
@@ -58,16 +69,19 @@ const AddEditProductModal = ({ open, handleClose, initialValues, addProduct, edi
                 category: data.category
             };
 
-            if (initialValues.id) {
-                await editProduct(initialValues.id, formData);
+
+            if (initialValues._id) {
+                await editProduct(initialValues._id, formData);
             } else {
                 await addProduct(formData);
             }
 
-            handleClose();
+            reset();
             setSelectedFiles([]);
             setSizes([]);
-            reset();
+            setRemoved([]);
+            handleClose();
+
         } catch (error) {
             console.error('Error:', error);
         }
@@ -80,9 +94,9 @@ const AddEditProductModal = ({ open, handleClose, initialValues, addProduct, edi
         },
         multiple: true,
         onDrop: (acceptedFiles) => {
-            setSelectedFiles(acceptedFiles.map(file => Object.assign(file, {
+            setSelectedFiles([...selectedFiles, ...acceptedFiles.map(file => Object.assign(file, {
                 preview: URL.createObjectURL(file)
-            })));
+            }))]);
         },
     });
 
@@ -114,7 +128,25 @@ const AddEditProductModal = ({ open, handleClose, initialValues, addProduct, edi
 
     useEffect(() => {
         getAllCategory();
-    },[])
+    }, []);
+
+    const handleRemoveImage = (indexToRemove) => {
+        // Copy the selectedFiles array
+        const updatedSelectedFiles = [...selectedFiles];
+        // Remove the image at the specified index
+        let remove = updatedSelectedFiles.splice(indexToRemove, 1);
+        
+        if (initialValues._id) {
+            setRemoved([...removed, ...remove]);
+        }
+        // Update the state with the modified array
+        setSelectedFiles(updatedSelectedFiles);
+    };
+
+    function isLocalFile(file) {
+        return file instanceof File || file instanceof Blob;
+    }
+
 
     return (
         <Modal open={open} onClose={() => { handleClose(); setSelectedFiles([]); setImageError(''); reset(); setSizes([]); setSizeError(''); }} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -286,14 +318,29 @@ const AddEditProductModal = ({ open, handleClose, initialValues, addProduct, edi
                 </div>
                 {selectedFiles.length > 0 && (
                     <Box>
-                        {selectedFiles.map(file => (
+                        {selectedFiles.map((file, i) => (
+                            <Box sx={{
+                                width: "10rem", height: "10rem",
+                                position: 'relative',
+                                display:'inline-block'
+                            }}>
                             <img
-                                key={file.name}
-                                src={URL.createObjectURL(file)}
+                                key={i}
+                                src={isLocalFile(file) ? URL.createObjectURL(file) : file}
                                 alt=''
-                                style={{ width: "10rem", height: "10rem", objectFit: "cover" }}
-                                onLoad={() => { URL.revokeObjectURL(URL.createObjectURL(file)) }}
-                            />
+                                style={{ width: "100%", height: "100%", objectFit: "contain" }}
+                                onLoad={() => isLocalFile(file) && URL.revokeObjectURL(URL.createObjectURL(file))}
+                                />
+                                <IconButton
+                                onClick={()=>handleRemoveImage(i)}
+                                    sx={{
+                                    position: 'absolute',
+                                    right: 0
+                                }}>
+                                    <CloseOutlined />
+                                </IconButton>
+                            </Box>
+
                         ))}
                     </Box>
                 )}

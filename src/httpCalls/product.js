@@ -24,3 +24,15 @@ export const addProductPost = async (data) => {
         console.log(error);
     }
 }
+
+export const editProductPut = async (data) => {
+    try {
+
+        let res = await axios.put(addNewProduct, data);
+
+        console.log(res);
+
+    } catch (error) {
+        console.log(error);
+    }
+}

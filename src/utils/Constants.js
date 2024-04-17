@@ -1,5 +1,6 @@
-// export const baseUrl = 'https://gnana-prakasam.onrender.com';
-export const baseUrl = 'http://localhost:4001';
+export const baseUrl = 'https://gnana-prakasam.vercel.app';
+// export const baseUrl = 'http://localhost:4001';
+
 
 
 // urls

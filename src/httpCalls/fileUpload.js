@@ -16,7 +16,7 @@ export const uploadFilePost = async (file,folder) => {
     }
 }
 
-export const uploadFilesPost = async (files, folder) => {
+export const uploadFilesPost = async (files, folder, removed) => {
     try {
 
         const formData = new FormData();
@@ -27,6 +27,15 @@ export const uploadFilesPost = async (files, folder) => {
         });
         
         formData.append('folder', folder);
+
+        if (removed) {
+            removed.forEach(rem => {
+                formData.append('removed', rem)
+            });
+        }
+
+        console.log(removed);
+        
         let { data } = await axios.post(uploadFiles, formData);
 
         return data?.file_urls ?? [];
