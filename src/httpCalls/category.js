@@ -24,6 +24,17 @@ export const addCategoryPost = async (data) => {
     }
 }
 
+export const editCategoryPut = async (id,data) => {
+    try {
+
+        let res = await axios.put(`${addNewCategory}/${id}`, data);
+
+        console.log(res);
+    } catch (error) {
+        console.log(error);
+    }
+}
+
 export const getAllCategories = async () => {
     try {
 

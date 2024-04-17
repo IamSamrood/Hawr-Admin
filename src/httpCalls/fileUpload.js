@@ -2,12 +2,16 @@ import { uploadFile, uploadFiles } from '../utils/Constants';
 import axios from '../utils/axios';
 
 
-export const uploadFilePost = async (file,folder) => {
+export const uploadFilePost = async (file,folder, removed) => {
     try {
 
         const formData = new FormData();
         formData.append('file', file);
         formData.append('folder', folder);
+
+        if (removed) {
+            formData.append('removed', removed);
+        }
         let { data } = await axios.post(uploadFile, formData);
 
         return data?.file_url ?? '';

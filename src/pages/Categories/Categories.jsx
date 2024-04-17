@@ -4,7 +4,7 @@ import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 import { useEffect, useState } from "react";
 import moment from "moment";
-import { addCategoryPost, getCategories } from "../../httpCalls/category";
+import { addCategoryPost, editCategoryPut, getCategories } from "../../httpCalls/category";
 import AddEditCategoryModal from "../../components/AddCategory/AddCategory";
 import { Delete, Edit } from "@mui/icons-material";
 
@@ -43,7 +43,7 @@ const Categories = () => {
 
 
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [initialValues, setInitialValues] = useState({ category: '', image: '' });
+    const [initialValues, setInitialValues] = useState({ category: '', image: '', id:'' });
 
     const handleOpenModal = () => {
         setIsModalOpen(true);
@@ -65,8 +65,7 @@ const Categories = () => {
     };
 
     const editCategory = async (categoryId, formData) => {
-        // Implement logic to edit category using categoryId and formData
-        console.log('Editing category:', categoryId, formData);
+       await editCategoryPut(categoryId,formData)
     };
 
     return (

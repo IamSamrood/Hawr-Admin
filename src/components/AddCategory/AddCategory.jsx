@@ -9,14 +9,13 @@ const AddEditCategoryModal = ({ open, handleClose, initialValues, addCategory, e
         defaultValues: { category: initialValues.category || '' },
     });
 
-    useEffect(() => {
-        if (initialValues) {
-            setValue("category", initialValues.category);
-        }
-    }, [initialValues]);
+    const [selectedFile, setSelectedFile] = useState([]);
+    const [imageError, setImageError] = useState();
 
-    const [selectedFile, setSelectedFile] = useState('');
-    const [imageError, setImageError] = useState('');
+    function isLocalFile(file) {
+        return file instanceof File || file instanceof Blob;
+    }
+
 
 
     const onSubmit = async (data) => {
@@ -27,7 +26,15 @@ const AddEditCategoryModal = ({ open, handleClose, initialValues, addCategory, e
                 return setImageError('Image is required');
             }
 
-            let url = await uploadFilePost(selectedFile[0], 'Category');
+            let url = '';
+
+            if (initialValues.id && isLocalFile(selectedFile[0])) {
+                 url = await uploadFilePost(selectedFile[0], 'Category', initialValues.image);
+            } else if (initialValues.id && !isLocalFile(selectedFile[0])) {
+                url = await uploadFilePost(selectedFile[0], 'Category');
+            } else {
+                url = await uploadFilePost(selectedFile[0], 'Category');
+            }
 
 
 
@@ -41,13 +48,13 @@ const AddEditCategoryModal = ({ open, handleClose, initialValues, addCategory, e
             if (initialValues.id) {
                 await editCategory(initialValues.id, formData);
             } else {
-                await addCategory(formData, selectedFile[0]);
+                await addCategory(formData);
             }
 
-
-            handleClose();
             setSelectedFile('');
             reset();
+            handleClose();
+            
         } catch (error) {
             console.error('Error:', error);
         }
@@ -65,6 +72,13 @@ const AddEditCategoryModal = ({ open, handleClose, initialValues, addCategory, e
             })));
         },
     });
+
+    useEffect(() => {
+        if (initialValues) {
+            setValue("category", initialValues.category);
+            setSelectedFile([initialValues.image]);
+        }
+    }, [initialValues]);
 
     return (
         <Modal open={open} onClose={() => { handleClose(); setSelectedFile(''); setImageError(''); reset(); }} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -88,28 +102,30 @@ const AddEditCategoryModal = ({ open, handleClose, initialValues, addCategory, e
                     )}
                 />
 
+                <>
+                    < div {...getRootProps()} style={{ marginTop: '16px', border: imageError ? '2px dashed red' : '2px dashed #ccc', borderRadius: '4px', padding: '16px', cursor: 'pointer' }}>
+                        <input {...getInputProps()} />
+                        <p>Drag 'n' drop an image here, or click to select an image</p>
+                    </div>
+                    {
+                        imageError &&
+                        <p style={{ color: 'red' }}>
+                            {imageError}
+                        </p>
+                    }
+                </>
+
                 {
-                    selectedFile.length > 0 ?
+                  selectedFile.length > 0 &&
                         <Box>
-                            <img src={selectedFile[0]?.preview} alt='' style={{
+                            <img src={selectedFile[0]?.preview ?? selectedFile[0]} alt='' style={{
                                 width: "10rem",
                                 height: "10rem",
                                 objectFit: "cover"
                             }}
                                 onLoad={() => { URL.revokeObjectURL(selectedFile[0]?.preview) }} />
-                        </Box> :
-                        <>
-                            < div {...getRootProps()} style={{ marginTop: '16px', border: imageError ? '2px dashed red' : '2px dashed #ccc', borderRadius: '4px', padding: '16px', cursor: 'pointer' }}>
-                            <input {...getInputProps()} />
-                            <p>Drag 'n' drop an image here, or click to select an image</p>
-                            </div>
-                            {
-                                imageError &&
-                                <p style={{color:'red'}}>
-                                      {imageError}  
-                                </p>
-                            }
-                        </>
+                        </Box> 
+                       
                         
                 }
                 <Button type="submit" variant="contained" color="primary" style={{ marginTop: '16px' }}>
