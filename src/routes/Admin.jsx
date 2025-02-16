@@ -3,22 +3,12 @@ import { Box, createTheme } from "@mui/material";
 import { useSelector } from "react-redux";
 import { Navigate, Outlet, Route, Routes } from "react-router-dom";
 import Navbar from "../components/Navbar/Navbar";
-// import SignIn from "../pages/signin/SingIn";
-// import Signup from "../pages/signup/Signup";
-import Home from "../pages/home/Home";
-import Categories from "../pages/Categories/Categories";
 import Products from "../pages/products/Products";
-import Coupons from "../pages/Coupons/Coupons";
 import Orders from "../pages/Orders/Orders";
 
-
-
-
 const Admin = () => {
-
     const currentUser = true; //useSelector((state) => Boolean(state.token));
     const mode = useSelector((state) => state.mode);
-
 
     const darkTheme = createTheme({
         palette: {
@@ -46,8 +36,6 @@ const Admin = () => {
 
         return children;
     };
-    
-
 
     return (
         <Routes>
@@ -59,20 +47,10 @@ const Admin = () => {
                     </ProtectedRoute>
                 }
             >
-                <Route path="/" element={<Home />} />
-                <Route path="/categories" element={<Categories />} />
-                <Route path="/products" element={<Products />} />
-                <Route path="/coupons" element={<Coupons />} />
+                <Route path="/" element={<Products />} />
                 <Route path="/orders" element={<Orders />} />
+                <Route path="*" element={<div>NOT FOUND</div>} />
             </Route>
-            {/* <Route
-                path="/login"
-                element={currentUser ? <Navigate to="/" /> : <SignIn />}
-            />
-            <Route
-                path="/signup"
-                element={currentUser ? <Navigate to="/" /> : <Signup />}
-            /> */}
         </Routes>
     );
 }

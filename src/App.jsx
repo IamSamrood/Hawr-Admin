@@ -1,9 +1,6 @@
 import { Routes, Route } from 'react-router-dom'
 import Admin from './routes/Admin';
 
-
-
-
 function App() {
   return (
     <div>

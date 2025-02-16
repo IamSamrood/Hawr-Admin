@@ -1,10 +1,8 @@
 import { uploadFile, uploadFiles } from '../utils/Constants';
 import axios from '../utils/axios';
 
-
 export const uploadFilePost = async (file,folder, removed) => {
     try {
-
         const formData = new FormData();
         formData.append('file', file);
         formData.append('folder', folder);
@@ -22,7 +20,6 @@ export const uploadFilePost = async (file,folder, removed) => {
 
 export const uploadFilesPost = async (files, folder, removed) => {
     try {
-
         const formData = new FormData();
 
         // Append each file to the FormData object
@@ -38,8 +35,6 @@ export const uploadFilesPost = async (files, folder, removed) => {
             });
         }
 
-        console.log(removed);
-        
         let { data } = await axios.post(uploadFiles, formData);
 
         return data?.file_urls ?? [];

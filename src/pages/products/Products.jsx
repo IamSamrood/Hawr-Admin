@@ -5,20 +5,18 @@ import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 import { useEffect, useState } from "react";
 import moment from "moment";
 import { Delete, Edit } from "@mui/icons-material";
-import { addProductPost, editProductPut, getProducts } from "../../httpCalls/product";
+import { addProductPost, deleteProduct, editProductPut, getProducts } from "../../httpCalls/product";
 import AddEditProductModal from "../../components/AddProduct/AddProduct";
-
+// import AddEditProductModal from "../../components/AddProduct/AddProduct";
 
 const Products = () => {
-
     const [products, setProducts] = useState([]);
+    const [search, setSearch] = useState('');
     const rowsPerPageOptions = [5, 10, 25];
     const [rowsPerPage, setRowsPerPage] = useState(rowsPerPageOptions[0]);
     const [page, setPage] = useState(1);
     const [total, setTotal] = useState(0);
-
-
-
+    const [reRender, setReRender] = useState(false)
 
     const handleChangePage = (event, newPage) => {
         setPage(newPage + 1);
@@ -29,23 +27,19 @@ const Products = () => {
         setPage(1);
     };
 
-
-
     const getAllProducts = async (page, rowsPerPage) => {
         let { products, total } = await getProducts(page, rowsPerPage);
         setProducts(products);
         setTotal(total);
     };
 
-    
-
     useEffect(() => {
         getAllProducts(page, rowsPerPage);
-    }, [rowsPerPage, page]);
+    }, [rowsPerPage, page, reRender]);
 
 
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [initialValues, setInitialValues] = useState('');
+    const [initialValues, setInitialValues] = useState({});
 
     const handleOpenModal = () => {
         setIsModalOpen(true);
@@ -58,6 +52,11 @@ const Products = () => {
     const handleEditClick = (product) => {
         setInitialValues(product);
         handleOpenModal();
+    }
+
+    const handleDelete = async (productId) => {
+       await deleteProduct(productId)
+       setReRender(!reRender)
     }
 
     const addProduct = async (formData) => {
@@ -108,7 +107,7 @@ const Products = () => {
                         </LocalizationProvider>
                     </Box>
                 </Stack>
-                <Stack direction="row" justifyContent={'end'}>
+                {/* <Stack direction="row" justifyContent={'end'}>
                     <Button
                         variant="contained"
                         color="primary"
@@ -125,7 +124,7 @@ const Products = () => {
                     >
                         Clear
                     </Button>
-                </Stack>
+                </Stack> */}
                 <h1>Products</h1>
                 <Button onClick={() => handleOpenModal()}>
                     Add Product
@@ -135,7 +134,6 @@ const Products = () => {
                         <TableHead>
                             <TableRow>
                                 <TableCell>ID</TableCell>
-                                <TableCell>Category</TableCell>
                                 <TableCell>Image</TableCell>
                                 <TableCell>Date</TableCell>
                                 <TableCell>Options</TableCell>
@@ -143,12 +141,10 @@ const Products = () => {
                         </TableHead>
                         <TableBody>
                             {
-
-
                                 products?.map((app) => (
                                     <TableRow key={app._id}>
+
                                         <TableCell>{app._id}</TableCell>
-                                        <TableCell>{app?.category.category}</TableCell>
                                         <TableCell>
                                             <Box sx={{
                                                 height: '3rem',
@@ -167,7 +163,7 @@ const Products = () => {
                                             <IconButton onClick={() => handleEditClick(app)}>
                                                 <Edit sx={{ color: 'blue' }} />
                                             </IconButton>
-                                            <IconButton>
+                                            <IconButton onClick={() => handleDelete(app._id)}>
                                                 <Delete sx={{ color: 'red' }} />
                                             </IconButton>
                                         </TableCell>
@@ -191,6 +187,8 @@ const Products = () => {
                 open={isModalOpen}
                 handleClose={handleCloseModal}
                 initialValues={initialValues}
+                reRender={reRender} 
+                setReRender={setReRender}
                 addProduct={addProduct}
                 editProduct={editProduct}
             />

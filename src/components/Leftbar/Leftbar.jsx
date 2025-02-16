@@ -9,13 +9,8 @@ import { useNavigate } from 'react-router-dom';
 import { Box } from '@mui/material';
 import { Article, Category, Inventory2, LocalOffer, Grading } from '@mui/icons-material';
 
-
 const Leftbar = () => {
-
-    const dispatch = useDispatch();
-
     const navigate = useNavigate();
-
 
     return (
         <Box flex={1}
@@ -27,27 +22,7 @@ const Leftbar = () => {
             <Box position='fixed'>
                 <List>
                     <ListItem disablePadding>
-                        <ListItemButton>
-                            <ListItemIcon>
-                                <Article />
-                            </ListItemIcon>
-                            <ListItemText primary="Appointments" />
-                        </ListItemButton>
-                    </ListItem>
-                </List>
-                <List>
-                    <ListItem disablePadding>
-                        <ListItemButton onClick={()=>navigate('/categories')}>
-                            <ListItemIcon>
-                                <Category />
-                            </ListItemIcon>
-                            <ListItemText primary="Categories" />
-                        </ListItemButton>
-                    </ListItem>
-                </List>
-                <List>
-                    <ListItem disablePadding>
-                        <ListItemButton onClick={() => navigate('/products')}>
+                        <ListItemButton onClick={() => navigate('/')}>
                             <ListItemIcon>
                                 <Inventory2 />
                             </ListItemIcon>
@@ -55,16 +30,7 @@ const Leftbar = () => {
                         </ListItemButton>
                     </ListItem>
                 </List>
-                <List>
-                    <ListItem disablePadding>
-                        <ListItemButton onClick={() => navigate('/coupons')}>
-                            <ListItemIcon>
-                                <LocalOffer />
-                            </ListItemIcon>
-                            <ListItemText primary="Coupons" />
-                        </ListItemButton>
-                    </ListItem>
-                </List>
+
                 <List>
                     <ListItem disablePadding>
                         <ListItemButton onClick={() => navigate('/orders')}>

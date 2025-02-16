@@ -1,360 +1,417 @@
-import React, { useEffect, useState } from 'react';
-import { Modal, TextField, Button, Box, IconButton, Select, MenuItem } from '@mui/material';
-import { useForm, Controller } from 'react-hook-form';
-import { useDropzone } from 'react-dropzone';
-import {  uploadFilesPost } from '../../httpCalls/fileUpload';
-import { Close, CloseOutlined } from '@mui/icons-material';
-import { getAllCategories } from '../../httpCalls/category';
+import { useEffect, useState } from "react";
+import { Modal, TextField, Button, Box, IconButton, Typography, Grid, MenuItem, Select, InputLabel, FormControl } from "@mui/material";
+import { useForm, Controller } from "react-hook-form";
+import { useDropzone } from "react-dropzone";
+import { uploadFilesPost } from "../../httpCalls/fileUpload";
+import { CloseOutlined } from "@mui/icons-material";
 
-const AddEditProductModal = ({ open, handleClose, initialValues, addProduct, editProduct }) => {
+const AddEditProductModal = ({
+  open,
+  handleClose,
+  initialValues,
+  addProduct,
+  editProduct,
+  reRender,
+  setReRender
+}) => {
+  const [selectedFiles, setSelectedFiles] = useState([]);
+  const [imageError, setImageError] = useState("");
+  const [removed, setRemoved] = useState([]);
+  const [topics, setTopics] = useState([]);
+  const [newTopic, setNewTopic] = useState(""); // State for the new topic input
 
+  const { handleSubmit, control, reset, setValue, formState: { errors } } = useForm({
+    defaultValues: initialValues,
+  });
 
-    const [selectedFiles, setSelectedFiles] = useState([]);
-    const [imageError, setImageError] = useState('');
-    const [sizes, setSizes] = useState([]);
-    const [sizeError, setSizeError] = useState('');
-    const [categories, setCategories] = useState([]);
-    const [removed, setRemoved] = useState([]);
-
-
-    const { handleSubmit, control, reset, setValue, formState: { errors } } = useForm({
-        defaultValues: initialValues,
-    });
-
-
-
-    useEffect(() => {
-        if (initialValues) {
-            setValue("name", initialValues.name);
-            setValue("quantityPerSize", initialValues.quantityPerSize);
-            setValue("description", initialValues.description);
-            setValue("rating", initialValues.rating);
-            setValue("code", initialValues.code);
-            setValue("category", initialValues.category._id);
-            setValue("offer", initialValues.offer);
-            setSizes(initialValues.size ?? []);
-            setSelectedFiles(initialValues.images);
-        }
-    }, [initialValues]);
-
-
-    const onSubmit = async (data) => {
-        try {
-            if (selectedFiles.length === 0) {
-                return setImageError('Image is required');
-            }
-
-            if (sizes.length === 0) {
-                return setSizeError('Sizes is required');
-            }
-
-            setSizeError('');
-
-            let urls = [];
-
-            console.log(removed);
-            if (initialValues._id) {
-             urls =  await uploadFilesPost(selectedFiles, 'Products', removed);
-            } else {
-                urls = await uploadFilesPost(selectedFiles, 'Products');
-            }
-
-            const formData = {
-                name: data.name,
-                sizes: sizes,
-                description: data.description,
-                images: urls,
-                code: data.code,
-                offer: data.offer,
-                category: data.category
-            };
-
-
-            if (initialValues._id) {
-                await editProduct(initialValues._id, formData);
-            } else {
-                await addProduct(formData);
-            }
-
-            reset();
-            setSelectedFiles([]);
-            setSizes([]);
-            setRemoved([]);
-            handleClose();
-
-        } catch (error) {
-            console.error('Error:', error);
-        }
-    };
-
-    // React Dropzone configuration
-    const { getRootProps, getInputProps } = useDropzone({
-        accept: {
-            'image/*': [],
-        },
-        multiple: true,
-        onDrop: (acceptedFiles) => {
-            setSelectedFiles([...selectedFiles, ...acceptedFiles.map(file => Object.assign(file, {
-                preview: URL.createObjectURL(file)
-            }))]);
-        },
-    });
-
-
-    const handleAddSize = () => {
-        setSizes([...sizes, { name: '', quantity: '', price: '' }]);
-    };
-
-    const handleRemoveSize = (index) => {
-        const newSizes = [...sizes];
-        newSizes.splice(index, 1);
-        setSizes(newSizes);
-    };
-
-    const handleSizeChange = (index, property, value) => {
-        const newSizes = [...sizes];
-        newSizes[index][property] = value;
-        setSizes(newSizes);
-    };
-
-    const getAllCategory = async () => {
-        try {
-            const data = await getAllCategories();
-            setCategories(data);
-        } catch (err) {
-            console.log(err);
-        }
+  useEffect(() => {
+    if (initialValues) {
+      setValue("name", initialValues.name);
+      setValue("duration", initialValues.duration);
+      setValue("schedule", initialValues.schedule);
+      setValue("ageGroup", initialValues.ageGroup);
+      setValue("price", initialValues.price);
+      setValue("description", initialValues.description); // Add description field
+      setSelectedFiles(initialValues.images || []);
+      setTopics(initialValues.topicsCovered || []); 
     }
+  }, [initialValues]);
 
-    useEffect(() => {
-        getAllCategory();
-    }, []);
+  const onSubmit = async (data) => {
+    try {
+      if (selectedFiles.length === 0) {
+        return setImageError("Image is required");
+      }
 
-    const handleRemoveImage = (indexToRemove) => {
-        // Copy the selectedFiles array
-        const updatedSelectedFiles = [...selectedFiles];
-        // Remove the image at the specified index
-        let remove = updatedSelectedFiles.splice(indexToRemove, 1);
-        
-        if (initialValues._id) {
-            setRemoved([...removed, ...remove]);
-        }
-        // Update the state with the modified array
-        setSelectedFiles(updatedSelectedFiles);
-    };
+      let urls = [];
+      if (initialValues._id) {
+        urls = await uploadFilesPost(selectedFiles, "Products", removed);
+      } else {
+        urls = await uploadFilesPost(selectedFiles, "Products");
+      }
 
-    function isLocalFile(file) {
-        return file instanceof File || file instanceof Blob;
+      const { price, description, name, schedule, ageGroup, duration } = data;
+      const formData = {
+        name,
+        description, // Include description in the form data
+        images: urls,
+        price,
+        duration,
+        schedule,
+        topicsCovered: topics,
+        ageGroup,
+      };
+
+      if (initialValues._id) {
+        await editProduct(initialValues._id, formData);
+      } else {
+        await addProduct(formData);
+      }
+      setReRender(!reRender);
+      reset();
+      setSelectedFiles([]);
+      setRemoved([]);
+      setTopics([]);
+      setNewTopic(""); // Reset the new topic input after submission
+      handleClose();
+    } catch (error) {
+      console.error("Error:", error);
     }
+  };
 
+  const { getRootProps, getInputProps } = useDropzone({
+    accept: {
+      "image/*": [],
+    },
+    multiple: true,
+    onDrop: (acceptedFiles) => {
+      setSelectedFiles([
+        ...selectedFiles,
+        ...acceptedFiles.map((file) =>
+          Object.assign(file, {
+            preview: URL.createObjectURL(file),
+          })
+        ),
+      ]);
+    },
+  });
 
-    return (
-        <Modal open={open} onClose={() => { handleClose(); setSelectedFiles([]); setImageError(''); reset(); setSizes([]); setSizeError(''); }} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <form style={{
-                backgroundColor: '#fff',
-                boxShadow: 'rgba(149, 157, 165, 0.2) 0px 8px 24px',
-                padding: '16px',
-                borderRadius: '8px',
-                outline: 'none',
-                maxHeight: '95vh', // Set maximum height
-                overflowY: 'auto' // Enable vertical scrolling
-            }} onSubmit={handleSubmit(onSubmit)}>
-                <Controller
-                    name="name"
-                    control={control}
-                    defaultValue=""
-                    rules={{ required: 'Name is required' }}
-                    render={({ field }) => (
-                        <TextField
-                            {...field}
-                            label="Name"
-                            fullWidth
-                            margin="normal"
-                            variant="outlined"
-                            error={!!errors.name}
-                            helperText={errors.name && errors.name.message}
-                        />
-                    )}
+  const handleRemoveImage = (indexToRemove) => {
+    const updatedSelectedFiles = [...selectedFiles];
+    let remove = updatedSelectedFiles.splice(indexToRemove, 1);
+
+    if (initialValues._id) {
+      setRemoved([...removed, ...remove]);
+    }
+    setSelectedFiles(updatedSelectedFiles);
+  };
+
+  const handleAddTopic = () => {
+    if (newTopic.trim() !== "") {
+      setTopics([...topics, newTopic]);
+      setNewTopic(""); // Clear the input field after adding the topic
+    }
+  };
+
+  const handleRemoveTopic = (index) => {
+    setTopics(topics.filter((_, i) => i !== index));
+  };
+
+  const handleImageLoad = (file) => {
+    // Revoke object URL after the image has loaded to avoid memory leaks.
+    URL.revokeObjectURL(file.preview);
+  };
+
+  return (
+    <Modal
+      open={open}
+      onClose={() => {
+        handleClose();
+        setSelectedFiles([]);
+        setImageError("");
+        reset();
+      }}
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      <form
+        style={{
+          backgroundColor: "#fff",
+          boxShadow: "rgba(149, 157, 165, 0.2) 0px 8px 24px",
+          padding: "12px", // Reduced padding further to fit more content
+          borderRadius: "8px",
+          outline: "none",
+          maxHeight: "80vh",
+          maxWidth: '80%',
+          overflowY: "auto",
+          display: "flex",
+          flexDirection: "column",
+        }}
+        onSubmit={handleSubmit(onSubmit)}
+      >
+        <Typography variant="h6" gutterBottom>
+          {initialValues._id ? "Edit Product" : "Add New Product"}
+        </Typography>
+
+        <Grid container spacing={1} sx={{ flexWrap: "wrap" }}>
+          <Grid item xs={12} sm={6}>
+            <Controller
+              name="name"
+              control={control}
+              rules={{ required: "Name is required" }}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  label="Product Name"
+                  fullWidth
+                  margin="normal"
+                  variant="outlined"
+                  error={!!errors.name}
+                  helperText={errors.name && errors.name.message}
+                  size="small" // Reduced size to save space
                 />
-                <Controller
-                    name="description"
-                    control={control}
-                    defaultValue=""
-                    rules={{ required: 'Description is required' }}
-                    render={({ field }) => (
-                        <TextField
-                            multiline
-                            rows={3}
-                            {...field}
-                            label="Description"
-                            fullWidth
-                            margin="normal"
-                            variant="outlined"
-                            error={!!errors.description}
-                            helperText={errors.description && errors.description.message}
-                        />
-                    )}
+              )}
+            />
+          </Grid>
+
+          <Grid item xs={12} sm={6}>
+            <Controller
+              name="price"
+              control={control}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  type="number"
+                  label="Price"
+                  fullWidth
+                  margin="normal"
+                  variant="outlined"
+                  size="small" // Reduced size to save space
                 />
+              )}
+            />
+          </Grid>
 
-                <Controller
-                    name="category"
-                    control={control}
-                    defaultValue=""
-                    rules={{ required: 'Category is required' }}
-                    render={({ field }) => (
-                        <>
-                            <Select
-                                {...field}
-                                displayEmpty
-                                defaultValue=""
-                                margin="normal"
-                                fullWidth
-                                variant="outlined"
-                                error={!!errors.doctor}
-                            >
+          <Grid item xs={12} sm={6}>
+            <FormControl fullWidth margin="normal" variant="outlined" size="small">
+              <InputLabel>Duration</InputLabel>
+              <Controller
+                name="duration"
+                control={control}
+                rules={{ required: "Duration is required" }}
+                render={({ field }) => (
+                  <Select
+                    {...field}
+                    label="Duration"
+                    error={!!errors.duration}
+                  >
+                    <MenuItem value="1 week">1 week</MenuItem>
+                    <MenuItem value="2 weeks">2 weeks</MenuItem>
+                    <MenuItem value="1 month">1 month</MenuItem>
+                    <MenuItem value="3 months">3 months</MenuItem>
+                    <MenuItem value="6 months">6 months</MenuItem>
+                    <MenuItem value="1 year">1 year</MenuItem>
+                  </Select>
+                )}
+              />
+            </FormControl>
+          </Grid>
 
-                                <MenuItem value="" disabled>
-                                    Select Category
-                                </MenuItem>
-                                {
-                                    categories?.map((catg) => (
-                                        <MenuItem key={catg._id} value={catg._id}>{catg.category}</MenuItem>
-                                    ))
-                                }
+          <Grid item xs={12} sm={6}>
+            <FormControl fullWidth margin="normal" variant="outlined" size="small">
+              <InputLabel>Age Group</InputLabel>
+              <Controller
+                name="ageGroup"
+                control={control}
+                rules={{ required: "Age Group is required" }}
+                render={({ field }) => (
+                  <Select
+                    {...field}
+                    label="Age Group"
+                    error={!!errors.ageGroup}
+                  >
+                    <MenuItem value="Children">Children</MenuItem>
+                    <MenuItem value="Teens">Teens</MenuItem>
+                    <MenuItem value="Adults">Adults</MenuItem>
+                    <MenuItem value="All Ages">All Ages</MenuItem>
+                  </Select>
+                )}
+              />
+            </FormControl>
+          </Grid>
 
-                            </Select>
-                            {errors.doctor && (
-                                <Typography variant="body2" color="error">
-                                    {errors.doctor.message}
-                                </Typography>
-                            )}
-                        </>
-                    )}
-
+          <Grid item xs={12} sm={6}>
+            <Controller
+              name="schedule"
+              control={control}
+              rules={{ required: "Schedule is required" }}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  label="Schedule"
+                  fullWidth
+                  margin="normal"
+                  variant="outlined"
+                  size="small"
+                  error={!!errors.schedule}
+                  helperText={errors.schedule && errors.schedule.message}
                 />
+              )}
+            />
+          </Grid>
 
-                <Controller
-                    name="code"
-                    control={control}
-                    defaultValue=""
-                    rules={{ required: 'Code is required' }}
-                    render={({ field }) => (
-                        <TextField
-                            {...field}
-                            label="Code"
-                            fullWidth
-                            margin="normal"
-                            variant="outlined"
-                            error={!!errors.code}
-                            helperText={errors.code && errors.code.message}
-                        />
-                    )}
+          {/* Description Section */}
+          <Grid item xs={12}>
+            <Controller
+              name="description"
+              control={control}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  label="Description"
+                  fullWidth
+                  margin="normal"
+                  variant="outlined"
+                  multiline
+                  rows={4} // Multiple lines for better visibility
+                  size="small" // Reduced size to save space
                 />
+              )}
+            />
+          </Grid>
 
-                
-                {/* Sizes */}
-                {sizes.map((size, index) => (
-                    <div style={{
-                        display: 'flex',
-                        gap: 2,
-                        alignItems:'center'
-                    }} key={index}>
-                        <TextField
-                            label={`Size Name ${index + 1}`}
-                            value={size.name}
-                            onChange={(e) => handleSizeChange(index, 'name', e.target.value)}
-                            
-                            margin="normal"
-                            variant="outlined"
-                            style={{ marginBottom: '8px', width:'80%' }}
-                        />
-                        <TextField
-                            label={`Quantity ${index + 1}`}
-                            value={size.quantity}
-                            onChange={(e) => handleSizeChange(index, 'quantity', e.target.value)}
-                            fullWidth
-                            margin="normal"
-                            variant="outlined"
-                            style={{ marginBottom: '8px', width: '80%' }}
-                        />
-                        <TextField
-                            label={`Price ${index + 1}`}
-                            value={size.price}
-                            onChange={(e) => handleSizeChange(index, 'price', e.target.value)}
-                            fullWidth
-                            margin="normal"
-                            variant="outlined"
-                            style={{ marginBottom: '8px', width: '80%' }}
-                        />
-                        <IconButton onClick={() => handleRemoveSize(index)} color="secondary"><Close/></IconButton>
-                    </div>
+          {/* Topic Section */}
+          <Grid item xs={12} sm={6}>
+            <TextField
+              value={newTopic}
+              onChange={(e) => setNewTopic(e.target.value)}
+              label="Add a Topic"
+              fullWidth
+              margin="normal"
+              variant="outlined"
+              size="small" // Reduced size to save space
+            />
+            <Button
+              onClick={handleAddTopic}
+              variant="contained"
+              color="primary"
+              style={{ marginTop: "8px", padding: "6px 16px" }} // Adjusted button size
+              size="small"
+            >
+              Add Topic
+            </Button>
+          </Grid>
+
+          <Grid item xs={12}>
+            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
+              {topics?.map((topic, index) => (
+                <Box
+                  key={index}
+                  sx={{
+                    backgroundColor: "#f4f4f4",
+                    padding: "8px 16px",
+                    borderRadius: "16px",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    boxShadow: "0px 2px 6px rgba(0,0,0,0.1)",
+                  }}
+                >
+                  <Typography variant="body2" sx={{ fontWeight: "bold" }}>
+                    {topic}
+                  </Typography>
+                  <IconButton
+                    onClick={() => handleRemoveTopic(index)}
+                    sx={{
+                      color: "red",
+                      backgroundColor: "rgba(0, 0, 0, 0.1)",
+                      padding: "4px",
+                      borderRadius: "50%",
+                    }}
+                  >
+                    <CloseOutlined />
+                  </IconButton>
+                </Box>
+              ))}
+            </Box>
+          </Grid>
+
+          {/* Image Section */}
+          <Grid item xs={12}>
+            <div
+              {...getRootProps()}
+              style={{
+                marginBottom: "10px",
+                border: "2px dashed #ddd",
+                padding: "10px",
+                borderRadius: "8px",
+                cursor: "pointer",
+              }}
+            >
+              <input {...getInputProps()} />
+              <Typography>Drag & Drop images here or click to select</Typography>
+            </div>
+            {imageError && <Typography color="error">{imageError}</Typography>}
+
+            {selectedFiles.length > 0 && (
+              <Box sx={{ mt: 2 }}>
+                {selectedFiles.map((file, i) => (
+                  <Box
+                    sx={{
+                      width: "8rem",
+                      height: "8rem",
+                      position: "relative",
+                      display: "inline-block",
+                      marginRight: "8px",
+                    }}
+                    key={i}
+                  >
+                    <img
+                      src={file.preview}
+                      alt=""
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "contain",
+                      }}
+                      onLoad={() => handleImageLoad(file)} // Revoke URL once loaded
+                    />
+                    <IconButton
+                      onClick={() => handleRemoveImage(i)}
+                      sx={{
+                        position: "absolute",
+                        right: 0,
+                        top: 0,
+                        color: "white",
+                        backgroundColor: "rgba(0, 0, 0, 0.5)",
+                      }}
+                    >
+                      <CloseOutlined />
+                    </IconButton>
+                  </Box>
                 ))}
-                <Button onClick={handleAddSize}>Add Size</Button>
-                {sizeError && (
-                    <p style={{ color: 'red' }}>
-                        {sizeError}
-                    </p>
-                )}
+              </Box>
+            )}
+          </Grid>
+        </Grid>
 
-                <Controller
-                    name="offer"
-                    control={control}
-                    defaultValue=""
-                    render={({ field }) => (
-                        <TextField
-                            {...field}
-                            type='number'
-                            label="Offer"
-                            fullWidth
-                            margin="normal"
-                            variant="outlined"
-                        />
-                    )}
-                />
-
-                <div {...getRootProps()} style={{ marginTop: '16px', border: imageError ? '2px dashed red' : '2px dashed #ccc', borderRadius: '4px', padding: '16px', cursor: 'pointer' }}>
-                    <input {...getInputProps()} />
-                    <p>Drag 'n' drop images here, or click to select images</p>
-                </div>
-                {selectedFiles.length > 0 && (
-                    <Box>
-                        {selectedFiles.map((file, i) => (
-                            <Box sx={{
-                                width: "10rem", height: "10rem",
-                                position: 'relative',
-                                display:'inline-block'
-                            }}>
-                            <img
-                                key={i}
-                                src={isLocalFile(file) ? URL.createObjectURL(file) : file}
-                                alt=''
-                                style={{ width: "100%", height: "100%", objectFit: "contain" }}
-                                onLoad={() => isLocalFile(file) && URL.revokeObjectURL(URL.createObjectURL(file))}
-                                />
-                                <IconButton
-                                onClick={()=>handleRemoveImage(i)}
-                                    sx={{
-                                    position: 'absolute',
-                                    right: 0
-                                }}>
-                                    <CloseOutlined />
-                                </IconButton>
-                            </Box>
-
-                        ))}
-                    </Box>
-                )}
-                {imageError && (
-                    <p style={{ color: 'red' }}>
-                        {imageError}
-                    </p>
-                )}
-                <Button type="submit" variant="contained" color="primary" style={{ marginTop: '16px' }}>
-                    Save
-                </Button>
-            </form>
-        </Modal>
-    );
+        <Box sx={{ display: "flex", justifyContent: "flex-end", marginTop: "16px" }}>
+          <Button
+            type="submit"
+            variant="contained"
+            color="primary"
+            sx={{ padding: "8px 16px" }}
+            size="small"
+          >
+            {initialValues._id ? "Update Product" : "Add Product"}
+          </Button>
+        </Box>
+      </form>
+    </Modal>
+  );
 };
 
 export default AddEditProductModal;

@@ -14,12 +14,6 @@
 // import { signUpPost } from '../../utils/Constants';
 // import { Toaster, toast } from 'react-hot-toast';
 
-
-
-
-
-
-
 // const Signup = () => {
 
 //     const [isSubmitting, setIsSubmitting] = useState(false);

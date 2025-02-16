@@ -17,17 +17,10 @@ import { useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { setLogout } from '../../state';
 
-
-
-
-
-
 const StyledToolbar = styled(Toolbar)({
     display: "flex",
     justifyContent: "space-between",
 });
-
-
 
 const Icons = styled(Box)(({ theme }) => ({
     display: "none",
@@ -47,8 +40,6 @@ const MobileIcons = styled(Box)(({ theme }) => ({
     }
 }));
 
-
-
 const Navbar = () => {
     const [open, setOpen] = useState(false);
     const [state, setState] = useState(false);
@@ -58,19 +49,17 @@ const Navbar = () => {
 
     const dispatch = useDispatch();
 
-
-
     return (
         <AppBar sx={{ backgroundColor: "rgba(39, 11, 96, 0.5)" }} position='sticky' >
             <StyledToolbar>
                 <Link to='/' style={{ textDecoration: "none", color: "inherit" }} >
                     <Typography variant='h6' sx={{ display: { xs: "none", md: "block" } }}>
-                        Gnana Prakasham
+                        Hawr Learn
                     </Typography>
                 </Link>
                 <Avatar src='https://res.cloudinary.com/dinc8ztk0/image/upload/v1678868414/icons8-connect-150_2_hofymj.png' sx={{ width: 30, height: 30, display: { xs: "block", md: "none" } }} onClick={toggleDrawer(true)} />
                 <LeftToggle state={state} setState={setState} />
-                <Typography sx={{ display: { md: "none" } }} >Gnana Prakasham</Typography>
+                <Typography sx={{ display: { md: "none" } }} >Hawr Learn</Typography>
                 <Icons>
                     <DarkModeIcon onClick={() => dispatch(setMode())} color='white' />
                     <Link to="/chats" style={{ color: 'white' }}>
@@ -83,7 +72,6 @@ const Navbar = () => {
                             <Notification color="white" />
                         </Badge>
                     </Link>
-                    {/* <Avatar sx={{ width: 30, height: 30 }} src={user?.profilePic} onClick={e => setOpen(true)} /> */}
                 </Icons>
                 <MobileIcons>
                     <DarkModeIcon onClick={() => dispatch(setMode())} color='white' />
@@ -97,7 +85,6 @@ const Navbar = () => {
                             <Notification color="white" />
                         </Badge>
                     </Link>
-                    {/* <Avatar sx={{ width: 30, height: 30 }} src='https://res.cloudinary.com/dinc8ztk0/image/upload/v1678868414/icons8-connect-150_2_hofymj.png' onClick={e => setOpen(true)} /> */}
                 </MobileIcons>
             </StyledToolbar>
             <Menu

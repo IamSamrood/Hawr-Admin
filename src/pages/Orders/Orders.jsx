@@ -6,17 +6,12 @@ import { useEffect, useState } from "react";
 import moment from "moment";
 import { getOrders, updateOrderStatus } from "../../httpCalls/order";
 
-
 const Orders = () => {
-
     const [orders, setOrders] = useState([]);
     const rowsPerPageOptions = [5, 10, 25];
     const [rowsPerPage, setRowsPerPage] = useState(rowsPerPageOptions[0]);
     const [page, setPage] = useState(1);
     const [total, setTotal] = useState(0);
-
-
-
 
     const handleChangePage = (event, newPage) => {
         setPage(newPage + 1);
@@ -26,8 +21,6 @@ const Orders = () => {
         setRowsPerPage(parseInt(event.target.value, 10));
         setPage(1);
     };
-
-
 
     const getAllOrders = async (page, rowsPerPage) => {
         let { orders, total } = await getOrders(page, rowsPerPage);
@@ -45,14 +38,9 @@ const Orders = () => {
         }
     }
 
-
-
     useEffect(() => {
         getAllOrders(page, rowsPerPage);
     }, [rowsPerPage, page]);
-
-
-
 
     return (
         <Grid container>
@@ -93,7 +81,7 @@ const Orders = () => {
                         </LocalizationProvider>
                     </Box>
                 </Stack>
-                <Stack direction="row" justifyContent={'end'}>
+                {/* <Stack direction="row" justifyContent={'end'}>
                     <Button
                         variant="contained"
                         color="primary"
@@ -110,13 +98,14 @@ const Orders = () => {
                     >
                         Clear
                     </Button>
-                </Stack>
+                </Stack> */}
                 <h1>Orders</h1>
                 <TableContainer component={Paper}>
                     <Table>
                         <TableHead>
                             <TableRow>
-                                <TableCell>ID</TableCell>
+                                <TableCell>Email</TableCell>
+                                <TableCell>Name</TableCell>
                                 <TableCell>Date</TableCell>
                                 <TableCell>Pyament Method</TableCell>
                                 <TableCell>Pyament Status</TableCell>
@@ -130,7 +119,10 @@ const Orders = () => {
 
                                 orders?.map((app) => (
                                     <TableRow key={app._id}>
-                                        <TableCell>{app._id}</TableCell>
+
+                                        {/* <TableCell>{app._id}</TableCell> */}
+                                        <TableCell>{app.email}</TableCell>
+                                        <TableCell>{app.name}</TableCell>
                                         <TableCell>{moment(app?.date).format('DD/MM/YYYY')}</TableCell>
                                         <TableCell>
                                            {app?.paymentMethod}
