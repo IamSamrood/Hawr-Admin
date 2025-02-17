@@ -10,6 +10,7 @@ import AddEditProductModal from "../../components/AddProduct/AddProduct";
 // import AddEditProductModal from "../../components/AddProduct/AddProduct";
 
 const Products = () => {
+    const [isNew, setIsNew] = useState(false);
     const [products, setProducts] = useState([]);
     const [search, setSearch] = useState('');
     const rowsPerPageOptions = [5, 10, 25];
@@ -50,17 +51,18 @@ const Products = () => {
     };
 
     const handleEditClick = (product) => {
+        setIsNew(false)
         setInitialValues(product);
         handleOpenModal();
     }
 
     const handleDelete = async (productId) => {
-       await deleteProduct(productId)
-       setReRender(!reRender)
+        await deleteProduct(productId)
+        setReRender(!reRender)
     }
 
     const addProduct = async (formData) => {
-       await addProductPost(formData)
+        await addProductPost(formData)
     };
 
     const editProduct = async (productId, formData) => {
@@ -126,7 +128,7 @@ const Products = () => {
                     </Button>
                 </Stack> */}
                 <h1>Products</h1>
-                <Button onClick={() => handleOpenModal()}>
+                <Button onClick={() =>{setIsNew(true); handleOpenModal()}}>
                     Add Product
                 </Button>
                 <TableContainer component={Paper}>
@@ -187,7 +189,8 @@ const Products = () => {
                 open={isModalOpen}
                 handleClose={handleCloseModal}
                 initialValues={initialValues}
-                reRender={reRender} 
+                reRender={reRender}
+                isNew={isNew}
                 setReRender={setReRender}
                 addProduct={addProduct}
                 editProduct={editProduct}

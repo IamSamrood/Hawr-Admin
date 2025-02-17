@@ -12,7 +12,8 @@ const AddEditProductModal = ({
   addProduct,
   editProduct,
   reRender,
-  setReRender
+  setReRender,
+  isNew
 }) => {
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [imageError, setImageError] = useState("");
@@ -23,6 +24,7 @@ const AddEditProductModal = ({
   const { handleSubmit, control, reset, setValue, formState: { errors } } = useForm({
     defaultValues: initialValues,
   });
+  console.log("🚀 ~ useEffect ~ initialValues.images:", initialValues.images)
 
   useEffect(() => {
     if (initialValues) {
@@ -33,7 +35,7 @@ const AddEditProductModal = ({
       setValue("price", initialValues.price);
       setValue("description", initialValues.description); // Add description field
       setSelectedFiles(initialValues.images || []);
-      setTopics(initialValues.topicsCovered || []); 
+      setTopics(initialValues.topicsCovered || []);
     }
   }, [initialValues]);
 
@@ -74,6 +76,7 @@ const AddEditProductModal = ({
       setTopics([]);
       setNewTopic(""); // Reset the new topic input after submission
       handleClose();
+
     } catch (error) {
       console.error("Error:", error);
     }
@@ -286,28 +289,31 @@ const AddEditProductModal = ({
 
           {/* Topic Section */}
           <Grid item xs={12} sm={6}>
-            <TextField
-              value={newTopic}
-              onChange={(e) => setNewTopic(e.target.value)}
-              label="Add a Topic"
-              fullWidth
-              margin="normal"
-              variant="outlined"
-              size="small" // Reduced size to save space
-            />
-            <Button
-              onClick={handleAddTopic}
-              variant="contained"
-              color="primary"
-              style={{ marginTop: "8px", padding: "6px 16px" }} // Adjusted button size
-              size="small"
-            >
-              Add Topic
-            </Button>
+            <Box display="flex" alignItems="center">
+              <TextField
+                value={newTopic}
+                onChange={(e) => setNewTopic(e.target.value)}
+                label="Add a Topic"
+                variant="outlined"
+                size="small"
+                fullWidth
+
+              />
+              <Button
+                onClick={handleAddTopic}
+                variant="contained"
+                color="primary"
+                size="medium"
+                sx={{ marginLeft: 1, width: '30%' }}
+              >
+                Add Topic
+              </Button>
+            </Box>
           </Grid>
 
+
           <Grid item xs={12}>
-            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
+            <Box sx={{ padding: '15px 0 ', display: "flex", flexWrap: "wrap", gap: 1 }}>
               {topics?.map((topic, index) => (
                 <Box
                   key={index}
@@ -371,7 +377,7 @@ const AddEditProductModal = ({
                     key={i}
                   >
                     <img
-                      src={file.preview}
+                      src={file?.preview || file}
                       alt=""
                       style={{
                         width: "100%",
@@ -407,7 +413,7 @@ const AddEditProductModal = ({
             sx={{ padding: "8px 16px" }}
             size="small"
           >
-            {initialValues._id ? "Update Product" : "Add Product"}
+            {isNew ? "Add Product" : "Update Product"}
           </Button>
         </Box>
       </form>
