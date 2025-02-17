@@ -212,6 +212,7 @@ const AddEditProductModal = ({
                     <MenuItem value="2 weeks">2 weeks</MenuItem>
                     <MenuItem value="1 month">1 month</MenuItem>
                     <MenuItem value="3 months">3 months</MenuItem>
+                    <MenuItem value="4 months">4 months</MenuItem>
                     <MenuItem value="6 months">6 months</MenuItem>
                     <MenuItem value="1 year">1 year</MenuItem>
                   </Select>
